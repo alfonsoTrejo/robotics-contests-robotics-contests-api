@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum ContestStatus {
+  OPEN
+  CLOSED
+  FINISHED
+}
+
+enum WinnerPosition {
+  FIRST
+  SECOND
+  THIRD
+}
+
+model User {
+  id           String       @id @default(uuid())
+  name         String
+  email        String       @unique
+  password     String?
+  role         Role         @default(STUDENT)
+  authProvider AuthProvider @default(LOCAL)
+  googleId     String?      @unique
+  createdAt    DateTime     @default(now())
+  teamMembers  TeamMember[]
+}
+
+model Contest {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  status      ContestStatus @default(OPEN)
+
+  modalities Modality[]
+  teams      Team[]
+}
+
+model Modality {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  contestId   String
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  teams   Team[]
+  winners Winner[]
+
+  @@index([contestId])
+  @@unique([contestId, name])
+}
+
+model Team {
+  id         String   @id @default(uuid())
+  name       String
+  contestId  String
+  modalityId String
+  createdAt  DateTime @default(now())
+
+  contest  Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  modality Modality @relation(fields: [modalityId], references: [id], onDelete: Cascade)
+
+  members TeamMember[]
+  winner  Winner?
+
+  @@index([contestId])
+  @@index([modalityId])
+  @@unique([modalityId, name])
+}
+
+model TeamMember {
+  id     String @id @default(uuid())
+  teamId String
+  userId String
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+model Winner {
+  id         String         @id @default(uuid())
+  teamId     String         @unique
+  modalityId String
+  position   WinnerPosition
+
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  modality Modality @relation(fields: [modalityId], references: [id], onDelete: Cascade)
+
+  // Solo un ganador por posición por modalidad
+  @@unique([modalityId, position])
+  @@index([modalityId])
+}
