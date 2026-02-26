@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import routes from "./routes/";
 import "dotenv/config";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use(
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use("/api", routes);
+
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`API on :${PORT}`));
