@@ -1,9 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
-import { ContestsService } from "../services/contests.service";
+import { ModalitiesService } from "../services/modalities.service";
 
-const service = new ContestsService();
 
-export class ContestsController {
+const service = new ModalitiesService();
+
+export class ModalitiesController {
   static async list(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await service.list();
@@ -16,6 +17,15 @@ export class ContestsController {
   static async get(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await service.get(req.params.id as string);
+      res.json({ ok: true, data });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async listByContest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await service.listByContest(req.params.contestId as string);
       res.json({ ok: true, data });
     } catch (e) {
       next(e);
