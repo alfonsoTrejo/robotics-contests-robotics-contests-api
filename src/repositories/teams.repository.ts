@@ -41,6 +41,21 @@ export class TeamsRepository {
     });
   }
 
+  findMyHistory(userId: string) {
+    return prisma.team.findMany({
+      where: {
+        members: { some: { userId } },
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        contest: true,
+        modality: true,
+        members: { include: { user: true } },
+        winner: true,
+      },
+    });
+  }
+
   delete(id: string) {
     return prisma.team.delete({ where: { id } });
   }
