@@ -7,10 +7,11 @@ const router = Router();
 
 // Público/ADMIN útil (luego lo restringimos)
 router.get("/", TeamsController.list);
-router.get("/:id", TeamsController.get);
 
 // Student (requiere login)
 router.get("/my", authMiddleware, roleMiddleware(["STUDENT"]), TeamsController.myTeams);
+
+router.get("/:id", TeamsController.get);
 
 // Crear team (Student)
 router.post("/", authMiddleware, roleMiddleware(["STUDENT"]), TeamsController.create);
