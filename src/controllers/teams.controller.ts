@@ -35,6 +35,21 @@ export class TeamsController {
     }
   }
 
+  static async findStudentByEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user?.userId) {
+        return res.status(401).json({ ok: false, error: { message: "Unauthorized" } });
+      }
+
+      const email = String(req.query.email ?? "");
+      const data = await service.findStudentByEmail(email, req.user.userId as string);
+
+      res.json({ ok: true, data });
+    } catch (e) {
+      next(e);
+    }
+  }
+
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.user?.userId) {

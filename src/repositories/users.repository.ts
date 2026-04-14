@@ -10,6 +10,20 @@ export class UsersRepository {
     return prisma.user.findUnique({ where: { email } });
   }
 
+  findStudentByEmail(email: string) {
+    return prisma.user.findFirst({
+      where: {
+        email,
+        role: "STUDENT",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+  }
+
   create(data: Prisma.UserCreateInput) {
     return prisma.user.create({ data });
   }

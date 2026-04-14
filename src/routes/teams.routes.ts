@@ -10,6 +10,12 @@ router.get("/", TeamsController.list);
 
 // Student (requiere login)
 router.get("/my", authMiddleware, roleMiddleware(["STUDENT"]), TeamsController.myTeams);
+router.get(
+	"/by-email",
+	authMiddleware,
+	roleMiddleware(["STUDENT"]),
+	TeamsController.findStudentByEmail,
+);
 
 router.get("/:id", TeamsController.get);
 

@@ -2,6 +2,7 @@ import { prisma } from "../prisma/client";
 import { TeamsRepository } from "../repositories/teams.repository";
 import { ContestsRepository } from "../repositories/contests.repository";
 import { ModalitiesRepository } from "../repositories/modalities.repository";
+import { UsersRepository } from "../repositories/users.repository";
 
 type CreateTeamDTO = {
   name: string;
@@ -15,7 +16,8 @@ export class TeamsService {
   constructor(
     private repo = new TeamsRepository(),
     private contestsRepo = new ContestsRepository(),
-    private modalitiesRepo = new ModalitiesRepository()
+    private modalitiesRepo = new ModalitiesRepository(),
+    private usersRepo = new UsersRepository(),
   ) {}
 
   async get(id: string) {
@@ -34,6 +36,32 @@ export class TeamsService {
 
   myTeams(userId: string) {
     return this.repo.findMyTeams(userId);
+  }
+
+  async findStudentByEmail(email: string, requesterUserId: string) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      const err = new Error("Email is required");
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    const student = await this.usersRepo.findStudentByEmail(normalizedEmail);
+
+    if (!student) {
+      const err = new Error("No existe un estudiante con ese correo");
+      (err as any).statusCode = 404;
+      throw err;
+    }
+
+    if (student.id === requesterUserId) {
+      const err = new Error("Ese correo corresponde a tu propio usuario");
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    return student;
   }
 
   async create(dto: CreateTeamDTO) {
