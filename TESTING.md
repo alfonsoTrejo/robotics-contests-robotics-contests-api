@@ -30,7 +30,7 @@ chmod +x test-rbac.sh
 **Opciones:**
 ```bash
 # Usar URL diferente
-API_URL=http://localhost:3000/api ./test-rbac.sh
+API_URL=https://localhost:8080/api ./test-rbac.sh
 ```
 
 ### 2. `test-student.sh` - Tests de Student y Ownership
@@ -142,21 +142,21 @@ Si prefieres probar manualmente con curl:
 
 ### 1. Registrar admin y guardar cookie
 ```bash
-curl -i -c cookies.txt -X POST http://localhost:8080/api/auth/register \
+curl -i --cacert ../certs/localhost-cert.pem -c cookies.txt -X POST https://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"Admin","email":"admin@test.com","password":"123456"}'
 ```
 
 ### 2. Crear contest (protegido)
 ```bash
-curl -i -b cookies.txt -X POST http://localhost:8080/api/contests \
+curl -i --cacert ../certs/localhost-cert.pem -b cookies.txt -X POST https://localhost:8080/api/contests \
   -H "Content-Type: application/json" \
   -d '{"title":"Contest","date":"2026-03-01T10:00:00.000Z","location":"Lab"}'
 ```
 
 ### 3. Intentar sin auth (debe fallar)
 ```bash
-curl -i -X POST http://localhost:8080/api/contests \
+curl -i --cacert ../certs/localhost-cert.pem -X POST https://localhost:8080/api/contests \
   -H "Content-Type: application/json" \
   -d '{"title":"Fail","date":"2026-03-01T10:00:00.000Z"}'
 ```
@@ -165,7 +165,7 @@ curl -i -X POST http://localhost:8080/api/contests \
 
 | Variable | Descripción | Default |
 |----------|-------------|---------|
-| `API_URL` | URL base de la API | `http://localhost:8080/api` |
+| `API_URL` | URL base de la API | `https://localhost:8080/api` |
 | `DATABASE_URL` | Connection string de PostgreSQL | - |
 | `JWT_SECRET` | Secret para firmar tokens | - |
 | `COOKIE_NAME` | Nombre de la cookie de auth | `rcms_token` |

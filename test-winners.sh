@@ -6,7 +6,12 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-API_URL="${API_URL:-http://localhost:8080/api}"
+API_URL="${API_URL:-https://localhost:8080/api}"
+TLS_CA_CERT="${TLS_CA_CERT:-../certs/localhost-cert.pem}"
+
+curl() {
+  command curl --cacert "$TLS_CA_CERT" "$@"
+}
 
 echo "======================================"
 echo "  Winners Tests with curl"

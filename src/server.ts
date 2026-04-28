@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import fs from "node:fs";
+import https from "node:https";
+import path from "node:path";
 import routes from "./routes/";
 import "dotenv/config";
 import { errorMiddleware } from "./middlewares/error.middleware";
@@ -26,7 +29,7 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(",") ?? ["http://localhost:3000"],
+    origin: process.env.CORS_ORIGIN?.split(",") ?? ["https://localhost:3000"],
     credentials: true,
   })
 );
@@ -37,5 +40,23 @@ app.use("/api", routes);
 
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`API on :${PORT}`));
+function readTlsCredentials() {
+  const keyPath = path.resolve(
+    process.cwd(),
+    process.env.TLS_KEY_PATH ?? "../certs/localhost-key.pem"
+  );
+  const certPath = path.resolve(
+    process.cwd(),
+    process.env.TLS_CERT_PATH ?? "../certs/localhost-cert.pem"
+  );
+
+  return {
+    key: fs.readFileSync(keyPath),
+    cert: fs.readFileSync(certPath),
+  };
+}
+
+const PORT = Number(process.env.PORT || 8080);
+const server = https.createServer(readTlsCredentials(), app);
+
+server.listen(PORT, () => console.log(`API on https://localhost:${PORT}`));

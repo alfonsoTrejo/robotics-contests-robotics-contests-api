@@ -2,7 +2,12 @@
 
 # Quick test to verify API is running
 
-API_URL="${API_URL:-http://localhost:8080}"
+API_URL="${API_URL:-https://localhost:8080}"
+TLS_CA_CERT="${TLS_CA_CERT:-../certs/localhost-cert.pem}"
+
+curl() {
+  command curl --cacert "$TLS_CA_CERT" "$@"
+}
 
 echo "Testing API connection..."
 echo "URL: $API_URL"

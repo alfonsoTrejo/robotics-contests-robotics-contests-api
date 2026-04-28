@@ -1,6 +1,6 @@
 # RCMS API Documentation
 
-Base URL: http://localhost:8080/api
+Base URL: https://localhost:8080/api
 
 All JSON responses follow:
 - Success: { "ok": true, "data": ... }
